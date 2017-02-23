@@ -3,6 +3,7 @@
 # Load dependencies
 suppressMessages(require(mvtnorm))
 suppressMessages( require(Rcpp) )
+sourceCpp("~/Dropbox/MyGitbub/poisson-log-gaussian-solver/helper.cpp")
 sourceCpp("~/Dropbox/PhD Research/Hierarchical Random Effect Model_Statistical Ecology/Eric/update_mu.cpp")
 
 # Helper Functions

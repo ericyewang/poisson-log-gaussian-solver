@@ -1,11 +1,10 @@
-# Metropolis Hastings witin Gibbs + Moment Matching
-# Use condtional ARS to sample the auxillary variables
-# Empirically update mu and Sigma using moment matching
+# code profiling
 
 rm(list = ls())
 
 # dependencies
 cat("loading dependencies...")
+suppressMessages(require(profvis))
 suppressMessages(require(parallel))
 suppressMessages(require(mvtnorm))
 suppressMessages(require(MCMCpack))
@@ -33,10 +32,9 @@ for (i in 1:n){
 }
 cat("finished\n")
 
-nb = 100
-ns = 100
+nb = 2000
+ns = 3000
 nmm = 100
-# 
 # 1. preparation
 # 1.1. preparation for parallel computing
 # put data into a list for parallel proccessing
@@ -69,12 +67,9 @@ vmu = NULL
 vS = NULL
 
 
-
-# iteration
-for (iter in 1:(nb+ns)){
-  if (iter%%((nb+ns)/100)==0){
-    cat("iteration",iter,"\n")
-  }
+# profile a single iteration
+iter = 1
+profvis({
   # update auxillary variables av
   Rinfo = condNorm(Sigma)
   tmp = mclapply(1:nABC,FUN = function(x){
@@ -107,4 +102,4 @@ for (iter in 1:(nb+ns)){
     # add the random effects back
     av = mMmu_x(muABC, hashABC, av, TRUE)
   }
-}
+})
