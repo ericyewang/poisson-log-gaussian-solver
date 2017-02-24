@@ -33,8 +33,8 @@ for (i in 1:n){
 }
 cat("finished\n")
 
-nb = 100
-ns = 100
+nb = 6000
+ns = 4000
 nmm = 100
 # 
 # 1. preparation
@@ -100,11 +100,21 @@ for (iter in 1:(nb+ns)){
   if (iter <= nb/2){
     # subtract the random effects
     av = mMmu_x(muABC, hashABC, av, FALSE)
-    mu = apply(av,1,mean)
-    Sigma = cov(t(av))
+    mu = 0.01*apply(av,1,mean)+0.99*mu
+    Sigma = 0.01*cov(t(av))+0.99*Sigma
     vmu = cbind(vmu,mu)
     vS = cbind(vS,c(Sigma))
     # add the random effects back
     av = mMmu_x(muABC, hashABC, av, TRUE)
   }
 }
+
+
+# check if the learned parameters make sense
+SigmaABC_s = matrix(apply(vSigma,1,mean),3,3)
+muABC_s = t(rmvnorm(nABC,rep(0,p),SigmaABC_s))
+muxxx = t(rmvnorm(n,mu,Sigma))+muABC_s[,hashABC]
+y_s = matrix(rpois(n*p,exp(c(muxxx))),p,n)
+
+# use the wrapper function
+res = plgmc(y,hashABC,nABC,100,100,0.99)
